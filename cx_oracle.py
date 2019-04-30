@@ -13,25 +13,10 @@ import cx_Oracle
 headers = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36'}
 ######################连接oracle
-'''
-import cx_Oracle                                          
-conn=cx_Oracle.connect('HZY_TEST/SBTit123@127.0.0.1/orcl')  
-c=conn.cursor()                                         
-x=c.execute('insert into zz_hzy_temp(line) values(3)')
-conn.commit();                 
-c.close()                                                 
-conn.close() 
-'''
-#####################
-#def OutputTypeHandler(cursor, name, defaultType, size,
-#        precision, scale): 
-#    if defaultType in (cx_Oracle.STRING, cx_Oracle.FIXED_CHAR): 
- #       return cursor.var(unicode, size, cursor.arraysize)
 print('连接到oracle数据库...')
 conn = cx_Oracle.connect('****/*****@*******/******')##用户名，密码，主机，数据库名
 #conn.outputtypehandler = OutputTypeHandler 
 print('数据库连接成功!')
-
 cur = conn.cursor()
 #判断表是否存在，若存在则删除此表
 cur.execute("DROP TABLE zb_content")
@@ -48,8 +33,7 @@ conn.commit()
 # 获取网站信息
 def getHtml(url):
     req = urllib2.Request(url)
-    req.headers = headers
-    
+    req.headers = headers  
     res = urllib2.urlopen(req)  # 打开网页
     #获取源代码
     text = res.read()
