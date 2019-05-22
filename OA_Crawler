@@ -1,0 +1,116 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Wed May 22 09:47:57 2019
+
+@author: sbtithzy
+"""
+import os
+os.environ['NLS_LANG'] = 'SIMPLIFIED CHINESE_CHINA.UTF8'
+import time
+start = time.clock()
+import urllib2, re, requests, HTMLParser
+import cx_Oracle
+headers = {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36'}
+######################连接oracle
+print('连接到oracle数据库...')
+conn = cx_Oracle.connect('用户名/密码@主机地址/数据库')###OA数据库 
+print('数据库连接成功!')
+cur = conn.cursor()
+sql1 = """select nvl(max(id),0) from picture"""
+Id = cur.execute(sql1)
+li =Id.fetchall()
+IdMax = li[0][0]
+conn.commit()
+#判断表是否存在，若存在则删除此表
+cur.execute("Truncate TABLE picture")
+#创建表 address_picture,title,address_title
+'''
+sql = """CREATE TABLE picture(
+                 ID INT,
+                 PICTUREURL VARCHAR2(1000),
+                 PICTURENAME VARCHAR2(1000),
+                 PICTURELINK VARCHAR2(1000),
+                 PICTUREORDER INT,
+                 PICTURETYPE  INT,
+                 EID VARCHAR2(1000)
+                 )"""
+'''
+#ID,PICTUREURL,PICTURENAME,PICTURELINK,PICTUREORDER,PICTURETYPE,EID
+#cur.execute(sql)
+#conn.commit()
+#########################
+# 获取网站信息
+#url = 'http://www.sobute.com/index.php/news.html'                 
+def getHtml(url):
+    req = urllib2.Request(url)
+    req.headers = headers
+    
+    res = urllib2.urlopen(req)  # 打开网页
+    #获取源代码
+    text = res.read()
+    #print text
+    return text
+#html = getHtml(url)
+# 提取新闻地址
+def getUrls(url):
+    html = getHtml(url)
+    pattern = re.compile('<li class="item">(.*?) class="clear">',re.S)
+    items = re.findall(pattern, html)
+    #print items
+    urls = []
+    for item in items:
+        urls.append(item[-50:-1])
+    #print urls
+    return urls
+PICTUREORDER = [1,2,3,4,5,6,7,8]
+ID = [IdMax+1,IdMax+2,IdMax+3,IdMax+4,IdMax+5,IdMax+6,IdMax+7,IdMax+8]
+def getContent(url): 
+    global i
+    html = getHtml(url)
+    pattern = re.compile('<h1>(.*?)</h1>')####文章标题 
+    pattern2 = re.compile('<img src="(.*?)" title="')######提取照片地址 
+    items = re.findall(pattern, html)
+    #print itemsPICTUREORDER
+
+    items2 = re.findall(pattern2, html)
+    # 获取正文
+# =============================================================================
+#     pattern3 = re.compile('<div class="allNoticCont">(.*?)</div>',re.S)
+#     items3 = re.findall(pattern3,html)
+# =============================================================================
+    ####保存数据
+    
+    result = []
+    result = [ID[i],items2[0],items[0],url,PICTUREORDER[i],2,132] 
+        #print i
+        #print result
+    cur.execute("INSERT INTO picture(ID,PICTUREURL,PICTURENAME,PICTURELINK,\
+                                        PICTUREORDER,PICTURETYPE,EID) \
+                VALUES ('%s','%s','%s','%s','%s','%s','%s')" % (ID[i],items2[0],items[0],url,PICTUREORDER[i],2,132))
+    conn.commit()
+#tex = getContent(url)
+i = 0
+def main():    
+    urls = ['http://www.sobute.com/index.php/news.html']    
+    print u'开始写入数据库，请稍等...'
+    x = 0    
+    for url in urls:
+        print url
+        html = getHtml(url)    
+        for url in getUrls(url):  
+            print url
+            try:            
+                getContent(url)
+                global i
+                x = x + 1
+                i = i + 1
+            except Exception,e:
+                print e
+                
+    print u'累计写入数据%s条'%(x)
+    print u'数据存储结束！'
+if __name__ == "__main__":  # 判断文件入口
+    main()
+elapsed = (time.clock() - start)#####时间结束点
+print u'累计用时:',elapsed #####累计用时
