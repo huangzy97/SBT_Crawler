@@ -16,7 +16,6 @@ print u'连接到oracle数据库...'
 conn = cx_Oracle.connect('HZY_TEST/SBTit123@127.0.0.1/orcl')####本地数据库
 print u'数据库连接成功!'
 cur = conn.cursor()
-#判断表是否存在，若存在则清空此表
 #创建表 address_picture,title,address_title
 # =============================================================================
 # sql = """CREATE TABLE HZY_ZB_CONTENT(
@@ -37,6 +36,7 @@ Id = cur.execute(sql1)
 li =Id.fetchall()
 IdMax = li[0][0]
 conn.commit()
+#判断表是否存在，若存在则清空此表
 cur.execute("Truncate TABLE HZY_ZB_CONTENT")
 # 获取网站信息
 #url = 'http://www.sobute.com/index.php/news.html'   
@@ -48,9 +48,7 @@ r1 = requests.get(url)
 r1txt = r1.text
 VIEWSTATE =re.findall(r'id="__VIEWSTATE" value="(.*?)" />', r1txt,re.I)
 EVENTVALIDATION =re.findall(r'id="__EVENTVALIDATION" value="(.*?)" />', r1txt,re.I)
-MaxPage = int(re.findall(r'<font color=\"red\"><b>1/(.*?)</b>', r1txt,re.I)[0])
-#url2请求头，请求body
-#page = 1
+MaxPage = int(re.findall(r'<font color=\"red\"><b>1/(.*?)</b>', r1txt,re.I)[0])###获取最大页码
 headers = {
         "Host":"www.jszb.com.cn",
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:67.0) Gecko/20100101 Firefox/67.0",
@@ -62,36 +60,8 @@ headers = {
         "Cookie": "ASP.NET_SessionId=vxvo2pjgqzy4ef55oqh5eq2x",
         "Upgrade-Insecure-Requests": "1",
         "Cache-Control": "max-age=0"
-        }
-# =============================================================================
-# 
-# data = {
-#         "__EVENTTARGET": "MoreInfoList1$Pager",
-#         "__EVENTARGUMENT": page,
-#         "__LASTFOCUS": "",
-#         "__VIEWSTATE": VIEWSTATE,
-#         "__VIEWSTATEGENERATOR": "76D0A3AC",
-#         "__VIEWSTATEENCRYPTED":"", 
-#         "__EVENTVALIDATION":EVENTVALIDATION,
-#         "MoreInfoList1$txtProjectName": "",
-#         "MoreInfoList1$txtBiaoDuanName":"", 
-#         "MoreInfoList1$txtBiaoDuanNo": "",
-#         "MoreInfoList1$txtJSDW": "",
-#         "MoreInfoList1$StartDate": "",
-#         "MoreInfoList1$EndDate": "",
-#         "MoreInfoList1$jpdDi": "-1",
-#         "MoreInfoList1$jpdXian": "-1"
-#         }
-# =============================================================================
-# =============================================================================
-# r = requests.post(url,headers=headers,data=data)
-# print(r.headers)
-# print(r.text)
-# print r'状态码',r.status_code
-# =============================================================================
-#####              
+        }            
 def getHtml(url,page):
-    #global Page
     data = {
         "__EVENTTARGET": "MoreInfoList1$Pager",
         "__EVENTARGUMENT": page,
@@ -115,7 +85,6 @@ def getHtml(url,page):
     text = r.text
     #print text
     return text
-#html = getHtml(url)
 # 提取新闻地址
 def getUrls(url,page):
     html = getHtml(url,page)
@@ -126,42 +95,26 @@ def getUrls(url,page):
     for item in items:
         urls.append('http://www.jszb.com.cn/jszb/YW_info/ZhaoBiaoGG/ViewReportDetail' + item)       
     return urls
-#txt = getUrls(url)
-# =============================================================================
-# PICTUREORDER = [1,2,3,4,5,6,7,8]
-# ID = [IdMax+1,IdMax+2,IdMax+3,IdMax+4,IdMax+5,IdMax+6,IdMax+7,IdMax+8]
-# =============================================================================
 i = IdMax
-#url2 = 'http://www.jszb.com.cn/jszb/YW_info/ZhaoBiaoGG/ViewReportDetail.aspx?RowID=675544&categoryNum=012&siteid=1'
-#url2 = 'http://www.jszb.com.cn/jszb/YW_info/ZhaoBiaoGG/ViewReportDetail.aspx?RowID=675670'
 def getContent(url,page): 
     global i
     html = getHtml(url,page) 
-    #<span id="RptEndDate_23" style="display:inline-block;width:120px;">2019年6月28日</span></td>
-
     pattern = re.compile('\](.*?)</b></font></td>',re.S)####文章标题 
     pattern2 = re.compile('<span id=\"RptEndDate_23\" style=\"display:inline-block;width:120px;\">(.*?)</span>',re.S)######公告结束时间
     pattern3 = re.compile('<span id=\"ZB_Type_23\" style=\"display:inline-block;width:97%;\">(.*?)</span>',re.S)####工程类型
     pattern4 = re.compile('<tr id=\"trzygg\" style=\"DISPLAY: none\">(.*?)<tr id=\"Tr17\">',re.S)####正文 
     items1 = re.findall(pattern, html)
-    #print items1[0]
     items2 = re.findall(pattern2, html)
-    #print items2[0]
     items3 = re.findall(pattern3, html)
-    #print items3[0]
     items4 = re.findall(pattern4, html)    
     htmeString = items4[0]
     # 获取正文
     pre = re.compile('>(.*?)<')
-    items4[0] = ''.join(pre.findall(htmeString))
-    #print items4[0]    
-#    result = []
-#    result = [i,items1[0],url,items2[0],items3[0],items4[0]] 
+    items4[0] = ''.join(pre.findall(htmeString))###清洗HTML标签
     cur.execute("INSERT INTO HZY_ZB_CONTENT(ID,TITLE,URL,NOTICE_END_DATE,\
                                         PROJECT_TYPE,CONTENT) \
                 VALUES ('%s','%s','%s','%s','%s','%s')" % (i,items1[0],url,items2[0],items3[0],items4[0][:2000]))
     conn.commit()
-#tex = getContent(url2,1)
 txta = ''
 def main():    
     urls = ['http://www.jszb.com.cn/jszb/YW_info/ZhaoBiaoGG/MoreInfo_ZBGG.aspx?categoryNum=012']    
