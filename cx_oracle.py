@@ -57,7 +57,7 @@ def getContent(url):
     # 获取正文
     pattern3 = re.compile('<div class="allNoticCont">(.*?)</div>',re.S)
     items3 = re.findall(pattern3,html)
-    ####保存数据 
+    ####保存数据  
     result = [items[0],url,items2[0],items3[0]] 
     cur.execute("INSERT INTO zb_content(title,address,relese_date,content) VALUES ('%s','%s','%s','%s')" % (items[0],url,items2[0],items3[0]))
     conn.commit()
