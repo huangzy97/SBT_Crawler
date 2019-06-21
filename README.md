@@ -6,7 +6,8 @@ OA抓取需求为抓取官网的新闻放到本地门户作为新闻浏览。需
 # [demo_oracle](https://github.com/huangzy97/SBT_Crawler/blob/master/OA_Crawler)  
 ## 动态数据抓取  
 http://www.jszb.com.cn/jszb/YW_info/ZhaoBiaoGG/MoreInfo_ZBGG.aspx?categoryNum=012
-这个网站是动态加载(URL不变，动态加载)，这个里面用到POST给服务器，然后服务器校验参数ViewState和EVENTVALIDATION,这两个参数不是很理解，F12看了一下，每次刷新页面这两个参数都是动态变化了，但是其他的Form数据是定的，所以我的基本思路是：  
+这个网站是动态加载(URL不变，动态加载)，这个里面用到POST给服务器，然后服务器校验参数ViewState和EVENTVALIDATION,这两个参数不是很理解，F12看了一下，每次刷新页面这两个参数都是动态变化了，但是其他的Form数据是定的。    
+基本思路是：  
 ### 1、用Get方式访问一次网站获取到ViewState和EVENTVALIDATION，然后把这两个参数作为Form的数据传给服务器。  
 ### 2、后面用Post方式带上头信息和Form信息去获取页面信息。  
 ### 3、抓取数据下载到数据库。  
