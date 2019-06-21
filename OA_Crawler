@@ -25,7 +25,7 @@ IdMax = li[0][0]
 conn.commit()
 #清空表数据
 cur.execute("Truncate TABLE picture")
-#########################
+######################### 
 # 获取网站信息
 #url = 'http://www.sobute.com/index.php/news.html'                 
 def getHtml(url):
