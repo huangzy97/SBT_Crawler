@@ -9,13 +9,13 @@ import urllib2, re, requests, HTMLParser
 import MySQLdb
 headers = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36'}
-print('Á¬½Óµ½mysql·şÎñÆ÷...')
+print('è¿æ¥åˆ°mysqlæœåŠ¡å™¨...')
 conn = MySQLdb.connect(host='127.0.0.1', user='root', passwd='123456', db='zhaobiao',charset='utf8')
-print('Êı¾İ¿âÁ¬½Ó³É¹¦!')
+print('æ•°æ®åº“è¿æ¥æˆåŠŸ!')
 cur = conn.cursor()
-#ÅĞ¶Ï±íÊÇ·ñ´æÔÚ£¬Èô´æÔÚÔòÉ¾³ı´Ë±í
+#åˆ¤æ–­è¡¨æ˜¯å¦å­˜åœ¨ï¼Œè‹¥å­˜åœ¨åˆ™åˆ é™¤æ­¤è¡¨
 cur.execute("DROP TABLE zb_content2")
-#´´½¨±í
+#åˆ›å»ºè¡¨
 sql = """CREATE TABLE zb_content2(
                  title  CHAR(200),
                  address CHAR(200),
@@ -23,15 +23,15 @@ sql = """CREATE TABLE zb_content2(
                  content  text)"""
 cur.execute(sql)
 conn.commit()
-# »ñÈ¡ÍøÕ¾ĞÅÏ¢
+# è·å–ç½‘ç«™ä¿¡æ¯
 def getHtml(url):
     req = urllib2.Request(url)
     req.headers = headers
-    res = urllib2.urlopen(req)  # ´ò¿ªÍøÒ³
-    #»ñÈ¡Ô´´úÂë
+    res = urllib2.urlopen(req)  # æ‰“å¼€ç½‘é¡µ
+    #è·å–æºä»£ç 
     text = res.read()
     return text
-# »ñÈ¡ÎÄÕÂÁ´½Ó
+# è·å–æ–‡ç« é“¾æ¥ 
 def getUrls(url):
     html = getHtml(url)
     pattern = re.compile('<a href="article(.*?)"')
@@ -42,15 +42,15 @@ def getUrls(url):
     return urls
 def getContent(url):
     html = getHtml(url)
-    pattern = re.compile('<h1 class="detailT">(.*?)</h1>')####ÌáÈ¡±êÌâ
-    pattern2 = re.compile('<span>·¢²¼Ê±¼ä</span><em>(.*?)</em>')######ÌáÈ¡·¢²¼Ê±¼ä
+    pattern = re.compile('<h1 class="detailT">(.*?)</h1>')####æå–æ ‡é¢˜
+    pattern2 = re.compile('<span>å‘å¸ƒæ—¶é—´</span><em>(.*?)</em>')######æå–å‘å¸ƒæ—¶é—´
     items = re.findall(pattern, html)
     result = []
     items2 = re.findall(pattern2, html)
-    # »ñÈ¡ÕıÎÄ
+    # è·å–æ­£æ–‡
     pattern3 = re.compile('<div class="allNoticCont">(.*?)</div>',re.S)
     items3 = re.findall(pattern3,html)
-    ####±£´æÊı¾İ 
+    ####ä¿å­˜æ•°æ® 
     result = [items[0],url,items2[0],items3[0]]    
     cur.execute("INSERT INTO zb_content2(title,address,relese_date,content) VALUES ('%s','%s','%s','%s');" % (items[0],url,items2[0],items3[0]))
     conn.commit()
@@ -59,7 +59,7 @@ def main():
         'http://www.crecgec.com/forum.php?mod=forumdisplay&fid=2&sortid=12&sortid=12&filter=sortid&mcode=0001&page={}'.format(
             str(i)) for i in range(1, 3)]
     
-    print u'¿ªÊ¼Ğ´ÈëÊı¾İ¿â£¬ÇëÉÔµÈ...'
+    print u'å¼€å§‹å†™å…¥æ•°æ®åº“ï¼Œè¯·ç¨ç­‰...'
     for url in urls:
         print url
         html = getHtml(url)
@@ -69,9 +69,9 @@ def main():
                 getContent(url)                
             except Exception,e:
                 print e
-    print u'ÀÛ¼ÆĞ´ÈëÊı¾İ%sÌõ'%(i*20)
-    print u'Êı¾İ´æ´¢½áÊø£¡'
-if __name__ == "__main__":  # ÅĞ¶ÏÎÄ¼şÈë¿Ú
+    print u'ç´¯è®¡å†™å…¥æ•°æ®%sæ¡'%(i*20)
+    print u'æ•°æ®å­˜å‚¨ç»“æŸï¼'
+if __name__ == "__main__":  # åˆ¤æ–­æ–‡ä»¶å…¥å£
     main()
-elapsed = (time.clock() - start)#####Ê±¼ä½áÊøµã
-print u'ÀÛ¼ÆÓÃÊ±:',elapsed #####ÀÛ¼ÆÓÃÊ±
+elapsed = (time.clock() - start)#####æ—¶é—´ç»“æŸç‚¹
+print u'ç´¯è®¡ç”¨æ—¶:',elapsed #####ç´¯è®¡ç”¨æ—¶
