@@ -125,10 +125,10 @@ def main():
             print u'正在存储第%s页数据...'  %(page) 
             for url in getUrls('http://www.jszb.com.cn/jszb/YW_info/ZhaoBiaoGG/MoreInfo_ZBGG.aspx?categoryNum=012',page):
                 try:            
-                    getContent(url,page)
-                    
+                    getContent(url,page)                    
                     global i
                     x = x + 1
+                    print u'已完成第%s页第%s条数据存储...'  %(page,x)
                     i = i + 1
                 except Exception,e:
                     print e              
