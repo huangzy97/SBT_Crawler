@@ -22,4 +22,4 @@ http://www.jszb.com.cn/jszb/YW_info/ZhaoBiaoGG/MoreInfo_ZBGG.aspx?categoryNum=01
 ### [动态抓取实例](https://github.com/huangzy97/SBT_Crawler/blob/master/Dynamic_crawl.py)   
 ### [江苏建设工程招标网全部代码](https://github.com/huangzy97/SBT_Crawler/blob/master/JSJSGCZBW_Crawler.py)  
 ## 动态数据抓取 2
-http://ggzy.njzwfw.gov.cn/njweb/  
+###### http://ggzy.njzwfw.gov.cn/njweb/南京市公共资源交易平台  
