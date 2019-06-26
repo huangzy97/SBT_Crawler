@@ -79,7 +79,7 @@ def getHtml(url,page):
         "MoreInfoList1$jpdDi": "-1",
         "MoreInfoList1$jpdXian": "-1"
         }
-    r = requests.post(url,headers=headers,data=data)
+    r = requests.post(url,headers=headers,data=data,timeout = 20)##add190626防止访问页面出现超时导致假死
     #print r'状态码',r.status_code
     #获取源代码
     text = r.text
