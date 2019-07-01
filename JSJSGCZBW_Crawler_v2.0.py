@@ -16,6 +16,12 @@ print (u'连接到oracle数据库...')
 conn = cx_Oracle.connect('账号/密码@IP地址/数据库名称')##需要连接的数据库 
 print (u'数据库连接成功!')
 cur = conn.cursor()
+# 备份原有数据 
+cur.execute("Truncate TABLE FR_OM_ZB_T")
+sql = """INSERT INTO FR_OM_ZB_T_BAK
+            SELECT * FROM  FR_OM_ZB_T"""
+cur.execute(sql)
+conn.commit()
 # 创建表 
 # =============================================================================
 # sql = """CREATE TABLE FR_OM_ZB_T(
