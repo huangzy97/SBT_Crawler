@@ -34,7 +34,6 @@ cur = conn.cursor()
 # cur.execute(sql)
 # conn.commit()
 # =============================================================================
-
 # get max id
 sql1 = """select nvl(max(id),0) from FR_OM_FSSYB_T"""
 Id = cur.execute(sql1)
